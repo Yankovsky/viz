@@ -81,10 +81,11 @@
 	<div id="newReplicaContainer" style="display: none;"><b>new_replica</b>
 		<ul class="arr" id="newReplica"></ul>
 	</div>
+	<div id="endedMessage" style="display: none">и так далее</div>
 </div>
 <script>
   let END = 16
-  let DELAY = 700
+  let DELAY = 360
 
   const clearState = () => {
     return {
@@ -145,6 +146,7 @@
   const newReplicaArrElement = document.getElementById('newReplica')
   const startButton = document.getElementById('startButton')
   const visualization = document.getElementById('visualization')
+  const endedMessageElement = document.getElementById('endedMessage')
 
   const renderArray = (arrElement, arr) => {
     arrElement.innerHTML = arr.map(el => `<li class="element ${ el ? 'notempty' : 'empty' }">${ el || '' }</li>`).join('')
@@ -156,6 +158,8 @@
       startButton.innerHTML = 'Ещё раз?'
     }
     visualization.style.display = state.started ? 'block' : 'none'
+
+    endedMessageElement.style.display = state.ended ? 'block' : 'none'
 
     nElement.innerHTML = String(state.counter)
 
