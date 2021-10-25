@@ -1,0 +1,179 @@
+<html>
+<head>
+	<meta charset="utf8">
+	<meta name='robots' content='noindex,nofollow'/>
+	<style>
+        .container {
+            display: flex;
+        }
+
+        ol li.active {
+            background: lightcyan;
+        }
+
+        ul.arr {
+            list-style: none;
+            display: flex;
+            margin: 0;
+            padding: 0;
+        }
+
+        li.element {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .element {
+            width: 32px;
+            height: 32px;
+            border: 1px solid black;
+        }
+
+        .element + .element {
+            border-left: none;
+        }
+
+        .element.empty {
+            background: lightgray;
+        }
+
+        .element.notempty {
+            background: lightgreen;
+        }
+	</style>
+</head>
+<body>
+<h3>Деамортизированная вставка в вектор</h3>
+<p>
+	Благодаря алгоритму, приведённому ниже, вставка нового элемента делается всегда за O(1).
+</p>
+<p>
+	Важно отметить, что в данной модели аллокация считается бесплатной или элементарной операцией, что в реальном мире
+	неверно.
+</p>
+<h3>Алгоритм</h3>
+<div>
+	<ol>
+		<li data-step="step1">Инициализируем два массива длин 1 и 2, назовём main и replica соответственно</li>
+		<li data-step="step2">На каждом шаге будем добавлять элемент в main, а в replica копировать два значения из
+			main
+		</li>
+		<li data-step="step3">При заполнении main
+			<ol>
+				<li data-step="step31">аллоцируем новый массив new_replica размера в два раза больше, чем replica</li>
+				<li data-step="step32">main = replica</li>
+				<li data-step="step33">replica = new_replica</li>
+				<li data-step="step34">Возвращаемся к шагу 2</li>
+			</ol>
+		</li>
+	</ol>
+</div>
+<button id="startButton">Начать визуализацию</button>
+<button id="next">next</button>
+<div id="visualization" style="display: none">
+	<div><b>N</b>: <span id="n">0</span></div>
+	<div><b>main</b>
+		<ul class="arr" id="main"></ul>
+	</div>
+	<div><b>replica</b>
+		<ul class="arr" id="replica"></ul>
+	</div>
+	<div id="newReplicaContainer" style="display: none;"><b>new_replica</b>
+		<ul class="arr" id="newReplica"></ul>
+	</div>
+</div>
+<script>
+  let END = 16
+  // state
+  let delay = 1000
+  let started = false
+  let step = 0
+  let counter = 0
+  let mainArr = [undefined]
+  let replicaArr = [undefined, undefined]
+  let newReplicaArr = undefined
+  let mainIterator = 0
+  let replicaIterator = 0
+
+  const update = () => {
+    if (!started) {
+      started = true
+      return 1
+    } else {
+      if (mainIterator >= mainArr.length || step === 32 || step === 33) {
+        if (step === 2) {
+          newReplicaArr = new Array(replicaArr.length * 2).fill(undefined)
+          return 31
+        } else if (step === 31) {
+          mainArr = replicaArr
+          return 32
+        } else if (step === 32) {
+          replicaArr = newReplicaArr
+          newReplicaArr = undefined
+          return 33
+        } else {
+          replicaIterator = 0
+          return 34
+        }
+      } else {
+        counter++
+        mainArr[mainIterator++] = counter
+        replicaArr[replicaIterator] = mainArr[replicaIterator++]
+        replicaArr[replicaIterator] = mainArr[replicaIterator++]
+        return 2
+      }
+    }
+
+  }
+
+  // render
+  const nElement = document.getElementById('n')
+  const mainArrElement = document.getElementById('main')
+  const replicaArrElement = document.getElementById('replica')
+  const newReplicaContainerElement = document.getElementById('newReplicaContainer')
+  const newReplicaArrElement = document.getElementById('newReplica')
+
+  const clear = () => {
+    document.querySelectorAll('[data-step]').forEach((step => step.classList.remove('active')))
+  }
+
+  const renderArray = (arrElement, arr) => {
+    arrElement.innerHTML = arr.map(el => `<li class="element ${ el ? 'notempty' : 'empty' }">${ el || '' }</li>`).join('')
+  }
+
+  const render = () => {
+    nElement.innerHTML = counter
+    document.querySelector(`[data-step=step${ step }]`).classList.add('active')
+    renderArray(mainArrElement, mainArr)
+    renderArray(replicaArrElement, replicaArr)
+    if (newReplicaArr) {
+      newReplicaContainerElement.style.display = 'block'
+      renderArray(newReplicaArrElement, newReplicaArr)
+    } else {
+      newReplicaContainerElement.style.display = 'none'
+    }
+  }
+
+  const loop = () => {
+    clear()
+    step = update()
+    render()
+    setTimeout(loop, delay)
+  }
+
+  const startButton = document.getElementById('startButton')
+  const visualization = document.getElementById('visualization')
+  startButton.addEventListener('click', () => {
+    startButton.style.display = 'none'
+    visualization.style.display = 'block'
+    loop()
+  })
+
+  const next = document.getElementById('next')
+  next.addEventListener('click', () => {
+    loop()
+  })
+</script>
+</body>
+</html>
