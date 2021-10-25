@@ -165,7 +165,9 @@
       nElement.innerHTML = String(state.counter)
 
       document.querySelectorAll('[data-step]').forEach((step => step.classList.remove('active')))
-      document.querySelector(`[data-step=step${ state.step }]`).classList.add('active')
+      if (state.step) {
+        document.querySelector(`[data-step=step${ state.step }]`).classList.add('active')
+      }
 
       renderArray(mainArrElement, state.mainArr)
       renderArray(replicaArrElement, state.replicaArr)
