@@ -85,110 +85,110 @@
 </div>
 <script>
   if (location.search.includes(atob('ZHJvd3NzYXB0ZXJjZXM='))) {
-	  let END = 16
-	  let DELAY = 360
+    let END = 16
+    let DELAY = 360
 
-	  const clearState = () => {
-	    return {
-	      started: false,
-	      ended: false,
-	      step: 0,
-	      counter: 0,
-	      mainArr: [undefined],
-	      replicaArr: [undefined, undefined],
-	      newReplicaArr: undefined,
-	      mainIterator: 0,
-	      replicaIterator: 0,
-	    }
-	  }
+    const clearState = () => {
+      return {
+        started: false,
+        ended: false,
+        step: 0,
+        counter: 0,
+        mainArr: [undefined],
+        replicaArr: [undefined, undefined],
+        newReplicaArr: undefined,
+        mainIterator: 0,
+        replicaIterator: 0,
+      }
+    }
 
-	  // state
-	  let state = undefined
+    // state
+    let state = undefined
 
-	  const update = () => {
-	    if (!state.started) {
-	      state = clearState()
-	      state.started = true
-	      state.step = 1
-	    } else {
-	      if (state.counter === END) {
-	        state.ended = true
-	        state.step = 0
-	      } else if (state.mainIterator >= state.mainArr.length || state.step === 32 || state.step === 33) {
-	        if (state.step === 2) {
-	          state.newReplicaArr = new Array(state.replicaArr.length * 2).fill(undefined)
-	          state.step = 31
-	        } else if (state.step === 31) {
-	          state.mainArr = state.replicaArr
-	          state.step = 32
-	        } else if (state.step === 32) {
-	          state.replicaArr = state.newReplicaArr
-	          state.newReplicaArr = undefined
-	          state.replicaIterator = 0
-	          state.step = 33
-	        } else {
-	          state.step = 34
-	        }
-	      } else {
-	        state.counter++
-	        state.mainArr[state.mainIterator++] = state.counter
-	        state.replicaArr[state.replicaIterator] = state.mainArr[state.replicaIterator++]
-	        state.replicaArr[state.replicaIterator] = state.mainArr[state.replicaIterator++]
-	        state.step = 2
-	      }
-	    }
-	  }
+    const update = () => {
+      if (!state.started) {
+        state = clearState()
+        state.started = true
+        state.step = 1
+      } else {
+        if (state.counter === END) {
+          state.ended = true
+          state.step = 0
+        } else if (state.mainIterator >= state.mainArr.length || state.step === 32 || state.step === 33) {
+          if (state.step === 2) {
+            state.newReplicaArr = new Array(state.replicaArr.length * 2).fill(undefined)
+            state.step = 31
+          } else if (state.step === 31) {
+            state.mainArr = state.replicaArr
+            state.step = 32
+          } else if (state.step === 32) {
+            state.replicaArr = state.newReplicaArr
+            state.newReplicaArr = undefined
+            state.replicaIterator = 0
+            state.step = 33
+          } else {
+            state.step = 34
+          }
+        } else {
+          state.counter++
+          state.mainArr[state.mainIterator++] = state.counter
+          state.replicaArr[state.replicaIterator] = state.mainArr[state.replicaIterator++]
+          state.replicaArr[state.replicaIterator] = state.mainArr[state.replicaIterator++]
+          state.step = 2
+        }
+      }
+    }
 
-	  // render
-	  const nElement = document.getElementById('n')
-	  const mainArrElement = document.getElementById('main')
-	  const replicaArrElement = document.getElementById('replica')
-	  const newReplicaContainerElement = document.getElementById('newReplicaContainer')
-	  const newReplicaArrElement = document.getElementById('newReplica')
-	  const startButton = document.getElementById('startButton')
-	  const visualization = document.getElementById('visualization')
-	  const endedMessageElement = document.getElementById('endedMessage')
+    // render
+    const nElement = document.getElementById('n')
+    const mainArrElement = document.getElementById('main')
+    const replicaArrElement = document.getElementById('replica')
+    const newReplicaContainerElement = document.getElementById('newReplicaContainer')
+    const newReplicaArrElement = document.getElementById('newReplica')
+    const startButton = document.getElementById('startButton')
+    const visualization = document.getElementById('visualization')
+    const endedMessageElement = document.getElementById('endedMessage')
 
-	  const renderArray = (arrElement, arr) => {
-	    arrElement.innerHTML = arr.map(el => `<li class="element ${ el ? 'notempty' : 'empty' }">${ el || '' }</li>`).join('')
-	  }
+    const renderArray = (arrElement, arr) => {
+      arrElement.innerHTML = arr.map(el => `<li class="element ${ el ? 'notempty' : 'empty' }">${ el || '' }</li>`).join('')
+    }
 
-	  const render = () => {
-	    startButton.style.display = (state.started && !state.ended) ? 'none' : 'block'
-	    if (state.ended) {
-	      startButton.innerHTML = 'Ещё раз?'
-	    }
-	    visualization.style.display = state.started ? 'block' : 'none'
+    const render = () => {
+      startButton.style.display = (state.started && !state.ended) ? 'none' : 'block'
+      if (state.ended) {
+        startButton.innerHTML = 'Ещё раз?'
+      }
+      visualization.style.display = state.started ? 'block' : 'none'
 
-	    endedMessageElement.style.display = state.ended ? 'block' : 'none'
+      endedMessageElement.style.display = state.ended ? 'block' : 'none'
 
-	    nElement.innerHTML = String(state.counter)
+      nElement.innerHTML = String(state.counter)
 
-	    document.querySelectorAll('[data-step]').forEach((step => step.classList.remove('active')))
-	    document.querySelector(`[data-step=step${ state.step }]`).classList.add('active')
+      document.querySelectorAll('[data-step]').forEach((step => step.classList.remove('active')))
+      document.querySelector(`[data-step=step${ state.step }]`).classList.add('active')
 
-	    renderArray(mainArrElement, state.mainArr)
-	    renderArray(replicaArrElement, state.replicaArr)
-	    if (state.newReplicaArr) {
-	      newReplicaContainerElement.style.display = 'block'
-	      renderArray(newReplicaArrElement, state.newReplicaArr)
-	    } else {
-	      newReplicaContainerElement.style.display = 'none'
-	    }
-	  }
+      renderArray(mainArrElement, state.mainArr)
+      renderArray(replicaArrElement, state.replicaArr)
+      if (state.newReplicaArr) {
+        newReplicaContainerElement.style.display = 'block'
+        renderArray(newReplicaArrElement, state.newReplicaArr)
+      } else {
+        newReplicaContainerElement.style.display = 'none'
+      }
+    }
 
-	  const loop = () => {
-	    update()
-	    render()
-	    setTimeout(loop, DELAY)
-	  }
+    const loop = () => {
+      update()
+      render()
+      setTimeout(loop, DELAY)
+    }
 
-	  startButton.addEventListener('click', () => {
-	    state = clearState()
-	    loop()
-	  })
+    startButton.addEventListener('click', () => {
+      state = clearState()
+      loop()
+    })
   } else {
-    document.body.innerHTML = 404
+    document.body.innerHTML = '404'
   }
 </script>
 </body>
