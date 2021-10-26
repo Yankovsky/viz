@@ -182,7 +182,9 @@
     const loop = () => {
       update()
       render()
-      setTimeout(loop, DELAY)
+      if (!state.ended) {
+        setTimeout(loop, DELAY)
+      }
     }
 
     startButton.addEventListener('click', () => {
